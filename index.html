@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Speed, Distance, Time Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+
+    .calculator {
+      background: #fff;
+      width: 100%;
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .block {
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    p {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .calculator {
+        width: 90%;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      input[type="text"],
+      button {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .calculator {
+        width: 80%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+    <h1>Speed, Distance & Time Calculator</h1>
+
+    <!-- Speed Calculation -->
+    <div class="block">
+      <input type="text" id="km" placeholder="Enter distance in kilometers">
+      <input type="text" id="hr" placeholder="Enter time in hours">
+      <input type="text" id="min" placeholder="Enter time in minutes">
+      <button onclick="calculateSpeed()">Calculate Speed</button>
+      <p id="resultSpeed"></p>
+    </div>
+
+    <!-- Distance Calculation -->
+    <div class="block">
+      <input type="text" id="dspeed" placeholder="Enter speed in km/h">
+      <input type="text" id="dhr" placeholder="Enter time in hours">
+      <input type="text" id="dmin" placeholder="Enter time in minutes">
+      <button onclick="calculateDistance()">Calculate Distance</button>
+      <p id="resultDistance"></p>
+    </div>
+
+    <!-- Time Calculation -->
+    <div class="block">
+      <input type="text" id="tkm" placeholder="Enter distance in kilometers">
+      <input type="text" id="tspeed" placeholder="Enter speed in km/h">
+      <button onclick="calculateTime()">Calculate Time</button>
+      <p id="resultTime"></p>
+    </div>
+  </div>
+
+  <script>
+    function calculateSpeed() {
+      const km = parseFloat(document.getElementById("km").value);
+      const hr = parseFloat(document.getElementById("hr").value);
+      const min = parseFloat(document.getElementById("min").value);
+
+      if (!isNaN(km) && (!isNaN(hr) || !isNaN(min))) {
+        const time = (hr * 60 + min);
+        const speed = km / (time / 60);
+        document.getElementById("resultSpeed").innerHTML = `Speed is ${speed.toFixed(2)} km/h`;
+      } else {
+        document.getElementById("resultSpeed").innerHTML = `Please enter valid values.`;
+      }
+    }
+
+    function calculateDistance() {
+      const speed = parseFloat(document.getElementById("dspeed").value);
+      const hr = parseFloat(document.getElementById("dhr").value);
+      const min = parseFloat(document.getElementById("dmin").value);
+
+      if (!isNaN(speed) && (!isNaN(hr) || !isNaN(min))) {
+        const time = (hr * 60 + min);
+        const distance = speed * (time / 60);
+        document.getElementById("resultDistance").innerHTML = `Distance is ${distance.toFixed(2)} km`;
+      } else {
+        document.getElementById("resultDistance").innerHTML = `Please enter valid values.`;
+      }
+    }
+
+    function calculateTime() {
+      const km = parseFloat(document.getElementById("tkm").value);
+      const speed = parseFloat(document.getElementById("tspeed").value);
+
+      if (!isNaN(km) && !isNaN(speed) && speed > 0) {
+        const time = (km / speed) * 60;
+        const hr = Math.floor(time / 60);
+        const min = Math.round(time % 60);
+        document.getElementById("resultTime").innerHTML = `Time is ${hr} hour(s) and ${min} minute(s)`;
+      } else {
+        document.getElementById("resultTime").innerHTML = `Please enter valid values.`;
+      }
+    }
+  </script>
+</body>
+</html>
