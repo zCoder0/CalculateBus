@@ -8,7 +8,7 @@
       color: #fff;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 60px;
+      padding-top: 40px;
     }
 
     .speedometer {
@@ -45,23 +45,68 @@
     }
 
     .speed-text {
-      margin-top: 30px;
+      margin-top: 20px;
       font-size: 24px;
+    }
+
+    .unit-buttons {
+      margin-top: 20px;
+    }
+
+    .unit-buttons button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #555;
+      color: #fff;
+    }
+
+    .unit-buttons button.active {
+      background-color: #0f0;
+      color: #000;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
   <h2>Analog Speedometer</h2>
+
+  <div class="unit-buttons">
+    <button id="kmhBtn" class="active">Km/hr</button>
+    <button id="msBtn">Meters/sec</button>
+  </div>
+
   <div class="speedometer">
     <div class="needle" id="needle"></div>
     <div class="center-dot"></div>
   </div>
+
   <div class="speed-text" id="speedText">Speed: 0 km/h</div>
 
   <script>
     let lastPosition = null;
     let lastTime = null;
+    let useKmh = true;
+
+    // Button listeners
+    document.getElementById("kmhBtn").addEventListener("click", () => {
+      useKmh = true;
+      toggleButtons();
+    });
+
+    document.getElementById("msBtn").addEventListener("click", () => {
+      useKmh = false;
+      toggleButtons();
+    });
+
+    function toggleButtons() {
+      document.getElementById("kmhBtn").classList.toggle("active", useKmh);
+      document.getElementById("msBtn").classList.toggle("active", !useKmh);
+    }
 
     function toRadians(deg) {
       return deg * Math.PI / 180;
@@ -98,10 +143,13 @@
         const speed_mps = distance / timeDiff;
         const speed_kmph = speed_mps * 3.6;
 
-        document.getElementById("speedText").textContent = `Speed: ${speed_kmph.toFixed(2)} km/h`;
+        const speed = useKmh ? speed_kmph : speed_mps;
+        const unit = useKmh ? "km/h" : "m/s";
 
-        // Rotate needle (0 to 180 deg max for 0 to 180 km/h)
-        const angle = Math.min(speed_kmph, 180); // Cap at 180
+        document.getElementById("speedText").textContent = `Speed: ${speed.toFixed(2)} ${unit}`;
+
+        // Rotate needle (0 to 180 deg max)
+        let angle = useKmh ? Math.min(speed, 180) : Math.min(speed * 18, 180);
         document.getElementById("needle").style.transform = `rotate(${angle}deg)`;
       }
 
