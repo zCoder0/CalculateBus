@@ -1,173 +1,348 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Analog Speedometer</title>
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 40px;
-    }
-
-    .speedometer {
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      background: radial-gradient(#444, #111);
-      margin: auto;
-      position: relative;
-      border: 6px solid #888;
-    }
-
-    .needle {
-      width: 4px;
-      height: 140px;
-      background: red;
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform-origin: bottom;
-      transform: rotate(0deg);
-      transition: transform 0.2s linear;
-    }
-
-    .center-dot {
-      width: 16px;
-      height: 16px;
-      background: #fff;
-      border-radius: 50%;
-      position: absolute;
-      top: 142px;
-      left: 142px;
-      z-index: 10;
-    }
-
-    .speed-text {
-      margin-top: 20px;
-      font-size: 24px;
-    }
-
-    .unit-buttons {
-      margin-top: 20px;
-    }
-
-    .unit-buttons button {
-      padding: 10px 20px;
-      margin: 0 10px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      background-color: #555;
-      color: #fff;
-    }
-
-    .unit-buttons button.active {
-      background-color: #0f0;
-      color: #000;
-      font-weight: bold;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeedMeter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .speedometer-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .analog-meter {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .dial {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background: #222;
+            border-radius: 50%;
+            top: 5%;
+            left: 5%;
+            z-index: 1;
+        }
+        
+        .needle {
+            position: absolute;
+            width: 2px;
+            height: 45%;
+            background: red;
+            top: 10%;
+            left: 50%;
+            transform-origin: 50% 100%;
+            transform: rotate(-135deg);
+            z-index: 2;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .needle::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #333;
+            border-radius: 50%;
+            top: 100%;
+            left: -4px;
+        }
+        
+        .markers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .marker {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: white;
+            top: 0;
+            left: 50%;
+            transform-origin: 50% 150px;
+        }
+        
+        .major-marker {
+            height: 25px;
+            background: red;
+        }
+        
+        .speed-text {
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            transform-origin: 50% 150px;
+            text-align: center;
+            width: 30px;
+            margin-left: -15px;
+        }
+        
+        .digital-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 3;
+            text-align: center;
+        }
+        
+        .unit {
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .unit-selector {
+            margin-bottom: 20px;
+        }
+        
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        
+        .ad {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ad h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .ad p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .ad button {
+            background: #0052CC;
+        }
+        
+        .ad button:hover {
+            background: #0066FF;
+        }
+    </style>
 </head>
 <body>
-
-  <h2>Analog Speedometer</h2>
-
-  <div class="unit-buttons">
-    <button id="kmhBtn" class="active">Km/hr</button>
-    <button id="msBtn">Meters/sec</button>
-  </div>
-
-  <div class="speedometer">
-    <div class="needle" id="needle"></div>
-    <div class="center-dot"></div>
-  </div>
-
-  <div class="speed-text" id="speedText">Speed: 0 km/h</div>
-
-  <script>
-    let lastPosition = null;
-    let lastTime = null;
-    let useKmh = true;
-
-    // Button listeners
-    document.getElementById("kmhBtn").addEventListener("click", () => {
-      useKmh = true;
-      toggleButtons();
-    });
-
-    document.getElementById("msBtn").addEventListener("click", () => {
-      useKmh = false;
-      toggleButtons();
-    });
-
-    function toggleButtons() {
-      document.getElementById("kmhBtn").classList.toggle("active", useKmh);
-      document.getElementById("msBtn").classList.toggle("active", !useKmh);
-    }
-
-    function toRadians(deg) {
-      return deg * Math.PI / 180;
-    }
-
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371e3;
-      const φ1 = toRadians(lat1);
-      const φ2 = toRadians(lat2);
-      const Δφ = toRadians(lat2 - lat1);
-      const Δλ = toRadians(lon2 - lon1);
-
-      const a = Math.sin(Δφ / 2) ** 2 +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ / 2) ** 2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-      return R * c;
-    }
-
-    function updateSpeed(position) {
-      const currentTime = Date.now();
-      const currentPos = position.coords;
-
-      if (lastPosition && lastTime) {
-        const timeDiff = (currentTime - lastTime) / 1000;
-        const distance = calculateDistance(
-          lastPosition.latitude,
-          lastPosition.longitude,
-          currentPos.latitude,
-          currentPos.longitude
-        );
-
-        const speed_mps = distance / timeDiff;
-        const speed_kmph = speed_mps * 3.6;
-
-        const speed = useKmh ? speed_kmph : speed_mps;
-        const unit = useKmh ? "km/h" : "m/s";
-
-        document.getElementById("speedText").textContent = `Speed: ${speed.toFixed(2)} ${unit}`;
-
-        // Rotate needle (0 to 180 deg max)
-        let angle = useKmh ? Math.min(speed, 180) : Math.min(speed * 18, 180);
-        document.getElementById("needle").style.transform = `rotate(${angle}deg)`;
-      }
-
-      lastPosition = currentPos;
-      lastTime = currentTime;
-    }
-
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(updateSpeed, err => {
-        document.getElementById("speedText").textContent = "Error accessing GPS.";
-      }, {
-        enableHighAccuracy: true,
-        maximumAge: 1000
-      });
-    } else {
-      document.getElementById("speedText").textContent = "Geolocation not supported.";
-    }
-  </script>
-
+    <h1>SpeedMeter</h1>
+    
+    <div class="controls">
+        <button id="analogBtn">ANALOG</button>
+        <button id="digitalBtn">DIGITAL</button>
+        <button id="stopBtn">STOP</button>
+    </div>
+    
+    <div class="speedometer-container">
+        <div class="analog-meter">
+            <div class="dial"></div>
+            <div class="markers" id="markers"></div>
+            <div class="needle" id="needle"></div>
+            <div class="digital-display">
+                <span id="digitalSpeed">0</span>
+                <div class="unit" id="unitDisplay">km/h</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="unit-selector">
+        <select id="unitSelector">
+            <option value="kmh">km/hour</option>
+            <option value="ms">meter/second</option>
+            <option value="mph">miles/hour</option>
+        </select>
+    </div>
+    
+    <div class="footer">
+        GPS data is "NOT" being stored, it's processed directly on your device.
+    </div>
+    
+    <div class="ad">
+        <h3>Advertisement</h3>
+        <p>Start for free</p>
+        <p>Give teams the context needed to make decisions while staying aligned with bigger goals</p>
+        <button>Jira - Sign Up</button>
+    </div>
+    
+    <script>
+        // DOM elements
+        const analogBtn = document.getElementById('analogBtn');
+        const digitalBtn = document.getElementById('digitalBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const unitSelector = document.getElementById('unitSelector');
+        const digitalSpeed = document.getElementById('digitalSpeed');
+        const unitDisplay = document.getElementById('unitDisplay');
+        const needle = document.getElementById('needle');
+        const markersContainer = document.getElementById('markers');
+        
+        // Speed variables
+        let currentSpeed = 0;
+        let maxSpeed = 220;
+        let isRunning = false;
+        let speedInterval;
+        let currentUnit = 'kmh';
+        
+        // Create markers for the speedometer
+        function createMarkers() {
+            markersContainer.innerHTML = '';
+            
+            // Create minor markers (every 10 km/h)
+            for (let i = 0; i <= 220; i += 10) {
+                const marker = document.createElement('div');
+                marker.className = 'marker';
+                marker.style.transform = `rotate(${i * (270 / 220) - 135}deg)`;
+                
+                // Every 20 km/h is a major marker
+                if (i % 20 === 0) {
+                    marker.classList.add('major-marker');
+                    
+                    // Add speed text for major markers
+                    const text = document.createElement('div');
+                    text.className = 'speed-text';
+                    text.style.transform = `rotate(${i * (270 / 220) - 135}deg)`;
+                    text.textContent = i;
+                    text.style.transform += ` rotate(${-(i * (270 / 220) - 135)}deg)`;
+                    markersContainer.appendChild(text);
+                }
+                
+                markersContainer.appendChild(marker);
+            }
+        }
+        
+        // Update the speed display
+        function updateSpeed() {
+            // Convert speed based on selected unit
+            let displaySpeed;
+            switch(currentUnit) {
+                case 'ms':
+                    displaySpeed = (currentSpeed / 3.6).toFixed(1);
+                    unitDisplay.textContent = 'm/s';
+                    break;
+                case 'mph':
+                    displaySpeed = (currentSpeed / 1.609).toFixed(1);
+                    unitDisplay.textContent = 'mph';
+                    break;
+                default: // kmh
+                    displaySpeed = Math.round(currentSpeed);
+                    unitDisplay.textContent = 'km/h';
+            }
+            
+            digitalSpeed.textContent = displaySpeed;
+            
+            // Update needle position (-135deg to 135deg for 0-220 km/h)
+            const rotation = (currentSpeed / maxSpeed) * 270 - 135;
+            needle.style.transform = `rotate(${rotation}deg)`;
+        }
+        
+        // Simulate speed changes
+        function simulateSpeed() {
+            if (!isRunning) return;
+            
+            // Random speed change
+            const change = Math.random() * 4 - 2; // -2 to +2
+            currentSpeed += change;
+            
+            // Keep speed within bounds
+            if (currentSpeed < 0) currentSpeed = 0;
+            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+            
+            updateSpeed();
+        }
+        
+        // Event listeners
+        analogBtn.addEventListener('click', () => {
+            // In a real app, this would switch to analog mode
+            alert('Analog mode selected (already displayed)');
+        });
+        
+        digitalBtn.addEventListener('click', () => {
+            // In a real app, this would switch to a digital-only display
+            alert('Digital-only display selected');
+        });
+        
+        stopBtn.addEventListener('click', () => {
+            isRunning = !isRunning;
+            stopBtn.textContent = isRunning ? 'STOP' : 'START';
+            
+            if (isRunning) {
+                speedInterval = setInterval(simulateSpeed, 100);
+            } else {
+                clearInterval(speedInterval);
+            }
+        });
+        
+        unitSelector.addEventListener('change', () => {
+            currentUnit = unitSelector.value;
+            updateSpeed();
+        });
+        
+        // Initialize
+        createMarkers();
+        updateSpeed();
+        
+        // Start with a demo speed
+        setTimeout(() => {
+            isRunning = true;
+            stopBtn.textContent = 'STOP';
+            speedInterval = setInterval(simulateSpeed, 100);
+        }, 1000);
+    </script>
 </body>
 </html>
