@@ -2,347 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedMeter</title>
+    <title>Real GPS Speedometer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
+            background: #0f2027;  /* nice gradient */
+            background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
+            color: white;
+            text-align: center;
+            padding-top: 100px;
         }
-        
-        .speedometer-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
+        h1 {
+            font-size: 48px;
             margin-bottom: 20px;
         }
-        
-        .analog-meter {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: #333;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .dial {
-            position: absolute;
-            width: 90%;
-            height: 90%;
-            background: #222;
-            border-radius: 50%;
-            top: 5%;
-            left: 5%;
-            z-index: 1;
-        }
-        
-        .needle {
-            position: absolute;
-            width: 2px;
-            height: 45%;
-            background: red;
-            top: 10%;
-            left: 50%;
-            transform-origin: 50% 100%;
-            transform: rotate(-135deg);
-            z-index: 2;
-            transition: transform 0.5s ease-in-out;
-        }
-        
-        .needle::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #333;
-            border-radius: 50%;
-            top: 100%;
-            left: -4px;
-        }
-        
-        .markers {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        .marker {
-            position: absolute;
-            width: 2px;
-            height: 15px;
-            background: white;
-            top: 0;
-            left: 50%;
-            transform-origin: 50% 150px;
-        }
-        
-        .major-marker {
-            height: 25px;
-            background: red;
-        }
-        
-        .speed-text {
-            position: absolute;
-            color: white;
-            font-size: 12px;
-            transform-origin: 50% 150px;
-            text-align: center;
-            width: 30px;
-            margin-left: -15px;
-        }
-        
-        .digital-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 24px;
+        #speed {
+            font-size: 72px;
             font-weight: bold;
-            z-index: 3;
-            text-align: center;
+            color: #00ffcc;
         }
-        
-        .unit {
-            font-size: 14px;
-            color: #aaa;
-        }
-        
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        button {
-            padding: 8px 15px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        button:hover {
-            background: #45a049;
-        }
-        
-        .unit-selector {
-            margin-bottom: 20px;
-        }
-        
-        select {
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        
-        .footer {
-            text-align: center;
-            color: #666;
-            font-size: 12px;
+        #status {
             margin-top: 20px;
-        }
-        
-        .ad {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            width: 300px;
-            text-align: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .ad h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        
-        .ad p {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .ad button {
-            background: #0052CC;
-        }
-        
-        .ad button:hover {
-            background: #0066FF;
+            font-size: 20px;
+            color: #ffcc00;
         }
     </style>
 </head>
 <body>
-    <h1>SpeedMeter</h1>
-    
-    <div class="controls">
-        <button id="analogBtn">ANALOG</button>
-        <button id="digitalBtn">DIGITAL</button>
-        <button id="stopBtn">STOP</button>
-    </div>
-    
-    <div class="speedometer-container">
-        <div class="analog-meter">
-            <div class="dial"></div>
-            <div class="markers" id="markers"></div>
-            <div class="needle" id="needle"></div>
-            <div class="digital-display">
-                <span id="digitalSpeed">0</span>
-                <div class="unit" id="unitDisplay">km/h</div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="unit-selector">
-        <select id="unitSelector">
-            <option value="kmh">km/hour</option>
-            <option value="ms">meter/second</option>
-            <option value="mph">miles/hour</option>
-        </select>
-    </div>
-    
-    <div class="footer">
-        GPS data is "NOT" being stored, it's processed directly on your device.
-    </div>
-    
-    <div class="ad">
-        <h3>Advertisement</h3>
-        <p>Start for free</p>
-        <p>Give teams the context needed to make decisions while staying aligned with bigger goals</p>
-        <button>Jira - Sign Up</button>
-    </div>
-    
+    <h1>Speedometer</h1>
+    <div id="speed">0 km/h</div>
+    <div id="status">Initializing GPS...</div>
+
     <script>
-        // DOM elements
-        const analogBtn = document.getElementById('analogBtn');
-        const digitalBtn = document.getElementById('digitalBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const unitSelector = document.getElementById('unitSelector');
-        const digitalSpeed = document.getElementById('digitalSpeed');
-        const unitDisplay = document.getElementById('unitDisplay');
-        const needle = document.getElementById('needle');
-        const markersContainer = document.getElementById('markers');
-        
-        // Speed variables
-        let currentSpeed = 0;
-        let maxSpeed = 220;
-        let isRunning = false;
-        let speedInterval;
-        let currentUnit = 'kmh';
-        
-        // Create markers for the speedometer
-        function createMarkers() {
-            markersContainer.innerHTML = '';
-            
-            // Create minor markers (every 10 km/h)
-            for (let i = 0; i <= 220; i += 10) {
-                const marker = document.createElement('div');
-                marker.className = 'marker';
-                marker.style.transform = `rotate(${i * (270 / 220) - 135}deg)`;
-                
-                // Every 20 km/h is a major marker
-                if (i % 20 === 0) {
-                    marker.classList.add('major-marker');
-                    
-                    // Add speed text for major markers
-                    const text = document.createElement('div');
-                    text.className = 'speed-text';
-                    text.style.transform = `rotate(${i * (270 / 220) - 135}deg)`;
-                    text.textContent = i;
-                    text.style.transform += ` rotate(${-(i * (270 / 220) - 135)}deg)`;
-                    markersContainer.appendChild(text);
-                }
-                
-                markersContainer.appendChild(marker);
-            }
+        const speedDisplay = document.getElementById('speed');
+        const statusDisplay = document.getElementById('status');
+
+        // Convert m/s to km/h
+        function toKmph(speedInMetersPerSecond) {
+            return speedInMetersPerSecond * 3.6;
         }
-        
-        // Update the speed display
-        function updateSpeed() {
-            // Convert speed based on selected unit
-            let displaySpeed;
-            switch(currentUnit) {
-                case 'ms':
-                    displaySpeed = (currentSpeed / 3.6).toFixed(1);
-                    unitDisplay.textContent = 'm/s';
+
+        // Success callback from Geolocation API
+        function updateSpeed(position) {
+            const speed = position.coords.speed;
+
+            if (speed === null) {
+                statusDisplay.textContent = "Move around to get GPS speed...";
+                return;
+            }
+
+            const speedInKmph = toKmph(speed).toFixed(1);
+            speedDisplay.textContent = `${speedInKmph} km/h`;
+            statusDisplay.textContent = "GPS Active";
+        }
+
+        // Error handling
+        function handleError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    statusDisplay.textContent = "Permission denied. Please enable location.";
                     break;
-                case 'mph':
-                    displaySpeed = (currentSpeed / 1.609).toFixed(1);
-                    unitDisplay.textContent = 'mph';
+                case error.POSITION_UNAVAILABLE:
+                    statusDisplay.textContent = "Location unavailable.";
                     break;
-                default: // kmh
-                    displaySpeed = Math.round(currentSpeed);
-                    unitDisplay.textContent = 'km/h';
+                case error.TIMEOUT:
+                    statusDisplay.textContent = "Request timed out.";
+                    break;
+                default:
+                    statusDisplay.textContent = "An unknown error occurred.";
+                    break;
             }
-            
-            digitalSpeed.textContent = displaySpeed;
-            
-            // Update needle position (-135deg to 135deg for 0-220 km/h)
-            const rotation = (currentSpeed / maxSpeed) * 270 - 135;
-            needle.style.transform = `rotate(${rotation}deg)`;
         }
-        
-        // Simulate speed changes
-        function simulateSpeed() {
-            if (!isRunning) return;
-            
-            // Random speed change
-            const change = Math.random() * 4 - 2; // -2 to +2
-            currentSpeed += change;
-            
-            // Keep speed within bounds
-            if (currentSpeed < 0) currentSpeed = 0;
-            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
-            
-            updateSpeed();
+
+        // Start watching GPS location
+        if ('geolocation' in navigator) {
+            navigator.geolocation.watchPosition(updateSpeed, handleError, {
+                enableHighAccuracy: true,
+                maximumAge: 1000,
+                timeout: 5000
+            });
+        } else {
+            statusDisplay.textContent = "Geolocation is not supported by your browser.";
         }
-        
-        // Event listeners
-        analogBtn.addEventListener('click', () => {
-            // In a real app, this would switch to analog mode
-            alert('Analog mode selected (already displayed)');
-        });
-        
-        digitalBtn.addEventListener('click', () => {
-            // In a real app, this would switch to a digital-only display
-            alert('Digital-only display selected');
-        });
-        
-        stopBtn.addEventListener('click', () => {
-            isRunning = !isRunning;
-            stopBtn.textContent = isRunning ? 'STOP' : 'START';
-            
-            if (isRunning) {
-                speedInterval = setInterval(simulateSpeed, 100);
-            } else {
-                clearInterval(speedInterval);
-            }
-        });
-        
-        unitSelector.addEventListener('change', () => {
-            currentUnit = unitSelector.value;
-            updateSpeed();
-        });
-        
-        // Initialize
-        createMarkers();
-        updateSpeed();
-        
-        // Start with a demo speed
-        setTimeout(() => {
-            isRunning = true;
-            stopBtn.textContent = 'STOP';
-            speedInterval = setInterval(simulateSpeed, 100);
-        }, 1000);
     </script>
 </body>
 </html>
