@@ -6,7 +6,6 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #0f2027;  /* nice gradient */
             background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
             color: white;
             text-align: center;
@@ -16,10 +15,15 @@
             font-size: 48px;
             margin-bottom: 20px;
         }
-        #speed {
-            font-size: 72px;
+        #speedKmph {
+            font-size: 60px;
             font-weight: bold;
             color: #00ffcc;
+        }
+        #speedMps {
+            font-size: 32px;
+            margin-top: 10px;
+            color: #66ff66;
         }
         #status {
             margin-top: 20px;
@@ -30,33 +34,33 @@
 </head>
 <body>
     <h1>Speedometer</h1>
-    <div id="speed">0 km/h</div>
+    <div id="speedKmph">0.0 km/h</div>
+    <div id="speedMps">0.0 m/s</div>
     <div id="status">Initializing GPS...</div>
 
     <script>
-        const speedDisplay = document.getElementById('speed');
+        const speedKmphDisplay = document.getElementById('speedKmph');
+        const speedMpsDisplay = document.getElementById('speedMps');
         const statusDisplay = document.getElementById('status');
 
-        // Convert m/s to km/h
-        function toKmph(speedInMetersPerSecond) {
-            return speedInMetersPerSecond * 3.6;
+        function toKmph(mps) {
+            return mps * 3.6;
         }
 
-        // Success callback from Geolocation API
         function updateSpeed(position) {
             const speed = position.coords.speed;
 
             if (speed === null) {
-                statusDisplay.textContent = "Move around to get GPS speed...";
+                statusDisplay.textContent = "Move to get GPS speed...";
                 return;
             }
 
-            const speedInKmph = toKmph(speed).toFixed(1);
-            speedDisplay.textContent = `${speedInKmph} km/h`;
+            const kmph = toKmph(speed);
+            speedKmphDisplay.textContent = `${kmph.toFixed(1)} km/h`;
+            speedMpsDisplay.textContent = `${speed.toFixed(1)} m/s`;
             statusDisplay.textContent = "GPS Active";
         }
 
-        // Error handling
         function handleError(error) {
             switch (error.code) {
                 case error.PERMISSION_DENIED:
@@ -74,7 +78,6 @@
             }
         }
 
-        // Start watching GPS location
         if ('geolocation' in navigator) {
             navigator.geolocation.watchPosition(updateSpeed, handleError, {
                 enableHighAccuracy: true,
