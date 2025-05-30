@@ -5,301 +5,316 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Speed, Distance, Time Calculator</title>
 
-  <script src="speedometter.js"></script>
+  <script src="speedometer.js"></script>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f1f1f1;
+    :root {
+      --primary: #4e6cff;
+      --primary-dark: #354bd0;
+      --accent: #44d7b6;
+      --dark: #1e1e2f;
+      --light: #f5f6fa;
+      --danger: #ff4f81;
+      --warning: #fbbc05;
+      --background: #0f2027;
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text-color: #ffffff;
+    }
+    
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
-
-
-    .speedometer {
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      background: radial-gradient(#444, #111);
-      margin: auto;
-      position: relative;
-      border: 6px solid #888;
-    }
-
-    .needle {
-      width: 4px;
-      height: 140px;
-      background: red;
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform-origin: bottom;
-      transform: rotate(0deg);
-      transition: transform 0.2s linear;
-    }
-
-    .center-dot {
-      width: 16px;
-      height: 16px;
-      background: #fff;
-      border-radius: 50%;
-      position: absolute;
-      top: 142px;
-      left: 142px;
-      z-index: 10;
-    }
-
-    .speed-text {
-      margin-top: 30px;
-      font-size: 24px;
-    }
-
-
-
-
-
-
-
-    .calculator {
-      background: #fff;
-      width: 100%;
-      max-width: 500px;
-      margin: 30px auto;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-
-    h1 {
+    
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: var(--text-color);
       text-align: center;
-      color: #333;
-      margin-bottom: 20px;
+      padding: 60px 15px;
     }
-
-    .block {
+    
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    #speed {
+      font-size: 64px;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+    
+    #status {
+      font-size: 18px;
+      color: var(--warning);
       margin-bottom: 30px;
     }
-
+    
+    .unit-toggle button {
+      background: var(--primary);
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      margin: 0 8px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .unit-toggle button:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .unit-toggle .active {
+      background-color: var(--accent) !important;
+      color: #000;
+    }
+    
+    .calculator-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .calculator {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      margin-top: 2rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    
+    .calculator h2 {
+      color: var(--light);
+      font-size: 1.8rem;
+      margin-bottom: 1.8rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+    }
+    
+    .block {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.05);
+    }
+    
+    .block-title {
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .input-field {
+      flex: 1 1 45%;
+      min-width: 200px;
+    }
+    
     input[type="number"],
     select {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      border: 1px solid #dfe6e9;
+      background-color: #fff;
+      color: #000;
+      transition: box-shadow 0.3s;
     }
-
-    input::placeholder {
-      color: #999;
+    
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(68, 215, 182, 0.3);
     }
-
+    
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.2rem;
+    }
+    
     button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      background-color: #007bff;
-      color: white;
+      flex: 1;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 600;
       border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      transition: all 0.3s ease;
     }
-
+    
     button:hover {
-      background-color: #0056b3;
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
     }
-
+    
+    button:active {
+      transform: scale(0.98);
+    }
+    
+    .clear-btn {
+      background: transparent;
+      border: 2px solid var(--danger);
+      color: var(--danger);
+    }
+    
+    .clear-btn:hover {
+      background: rgba(255, 79, 129, 0.05);
+    }
+    
     .result {
-      background-color: #e6f7ff;
-      padding: 10px;
-      border-left: 5px solid #007bff;
-      border-radius: 4px;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #333;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2d3436;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      border-left: 5px solid var(--accent);
+      text-align: left;
     }
-
-    @media (max-width: 600px) {
-      .calculator {
-        width: 90%;
-        padding: 20px;
-      }
-
+    
+    .result::before {
+      content: "🧮 ";
+    }
+    
+    @media (max-width: 768px) {
       h1 {
-        font-size: 22px;
+        font-size: 2.2rem;
       }
-
-      input, select, button {
-        font-size: 14px;
+    
+      #speed {
+        font-size: 3rem;
+      }
+    
+      .input-field {
+        flex: 1 1 100%;
+      }
+    
+      .button-group {
+        flex-direction: column;
       }
     }
-
-    @media (min-width: 601px) and (max-width: 1024px) {
-      .calculator {
-        width: 80%;
-      }
-    }
+    
   </style>
 </head>
 <body>
 
+  <header>
+    <h1>Speedometer</h1>
+    <div id="speed">0.0</div>
+    <div id="status">Initializing GPS...</div>
 
+    <div class="unit-toggle">
+      <button id="showKmph" class="active">Kilometers/hour</button>
+      <button id="showMps">Meters/second</button>
+    </div>
+  </header>
 
+  <div class="calculator-container">
+    <div class="calculator">
+      <h2>Speed, Distance & Time Calculator</h2>
 
+      <!-- Speed Block -->
+      <div class="block">
+        <div class="block-title">Calculate Speed</div>
+        <div class="input-group">
+          <div class="input-field">
+            <input type="number" id="km" placeholder="Enter distance" />
+          </div>
+          <div class="input-field">
+            <select id="distanceUnit">
+              <option value="km">Kilometers</option>
+              <option value="m">Meters</option>
+            </select>
+          </div>
+          <div class="input-field">
+            <input type="number" id="hr" placeholder="Hours" />
+          </div>
+          <div class="input-field">
+            <input type="number" id="min" placeholder="Minutes" />
+          </div>
+        </div>
+        <div class="button-group">
+          <button onclick="calculateSpeed()">Calculate Speed</button>
+          <button class="clear-btn" onclick="clearSpeed()">Clear</button>
+        </div>
+        <div id="resultSpeed" class="result"></div>
+      </div>
 
-    
-  <h2>Analog Speedometer</h2>
-  <div class="speedometer">
-    <div class="needle" id="needle"></div>
-    <div class="center-dot"></div>
+      <!-- Distance Block -->
+      <div class="block">
+        <div class="block-title">Calculate Distance</div>
+        <div class="input-group">
+          <div class="input-field">
+            <input type="number" id="dspeed" placeholder="Enter speed" />
+          </div>
+          <div class="input-field">
+            <select id="speedUnit">
+              <option value="km/h">Kilometers/hour</option>
+              <option value="m/s">Meters/second</option>
+            </select>
+          </div>
+          <div class="input-field">
+            <input type="number" id="dhr" placeholder="Hours" />
+          </div>
+          <div class="input-field">
+            <input type="number" id="dmin" placeholder="Minutes" />
+          </div>
+        </div>
+        <div class="button-group">
+          <button onclick="calculateDistance()">Calculate Distance</button>
+          <button class="clear-btn" onclick="clearDistance()">Clear</button>
+        </div>
+        <div id="resultDistance" class="result"></div>
+      </div>
+
+      <!-- Time Block -->
+      <div class="block">
+        <div class="block-title">Calculate Time</div>
+        <div class="input-group">
+          <div class="input-field">
+            <input type="number" id="tkm" placeholder="Enter distance" />
+          </div>
+          <div class="input-field">
+            <select id="timeDistanceUnit">
+              <option value="km">Kilometers</option>
+              <option value="m">Meters</option>
+            </select>
+          </div>
+          <div class="input-field">
+            <input type="number" id="tspeed" placeholder="Enter speed" />
+          </div>
+        </div>
+        <div class="button-group">
+          <button onclick="calculateTime()">Calculate Time</button>
+          <button class="clear-btn" onclick="clearTime()">Clear</button>
+        </div>
+        <div id="resultTime" class="result"></div>
+      </div>
+    </div>
   </div>
-  <div class="speed-text" id="speedText">Speed: 0 km/h</div>
 
-
-
-  <h1><a href="check.html">Test</a></h1>
-  
-  <div class="calculator">
-    <h1>Speed, Distance & Time Calculator</h1>
-
-    <!-- Speed Calculation -->
-    <div class="block">
-      <input type="number" id="km" placeholder="Enter distance" />
-      <select id="distanceUnit">
-        <option value="km">Kilometers</option>
-        <option value="m">Meters</option>
-      </select>
-
-      <input type="number" id="hr" placeholder="Enter time in hours" />
-      <input type="number" id="min" placeholder="Enter time in minutes" />
-      <button onclick="calculateSpeed()">Calculate Speed</button>
-      <button onclick="clearSpeed()">Clear</button>
-      <div id="resultSpeed" class="result"></div>
-    </div>
-
-    <!-- Distance Calculation -->
-    <div class="block">
-      <input type="number" id="dspeed" placeholder="Enter speed" />
-      <select id="speedUnit">
-        <option value="km/h">Kilometers/Hour</option>
-        <option value="m/s">Meters/Seconds</option>
-      </select>
-
-      <input type="number" id="dhr" placeholder="Enter time in hours" />
-      <input type="number" id="dmin" placeholder="Enter time in minutes" />
-      <button onclick="calculateDistance()">Calculate Distance</button>
-      <button onclick="clearDistance()">Clear</button>
-      <div id="resultDistance" class="result"></div>
-    </div>
-
-    <!-- Time Calculation -->
-    <div class="block">
-      <input type="number" id="tkm" placeholder="Enter distance" />
-      <select id="timeDistanceUnit">
-        <option value="km">Kilometers</option>
-        <option value="m">Meters</option>
-      </select>
-
-      <input type="number" id="tspeed" placeholder="Enter speed" />
-
-      <button onclick="calculateTime()">Calculate Time</button>
-      <button onclick="clearTime()">Clear</button>
-      <div id="resultTime" class="result"></div>
-    </div>
-  </div>
-
-
-
-  <script>
-    
-    function calculateSpeed() {
-    const distance = parseFloat(document.getElementById("km").value);
-    const hr = parseFloat(document.getElementById("hr").value);
-    const min = parseFloat(document.getElementById("min").value);
-    const unit = document.getElementById("distanceUnit").value;
-  
-    if (!isNaN(distance) && (!isNaN(hr) || !isNaN(min))) {
-      const timeInSeconds = ((hr || 0) * 3600) + ((min || 0) * 60);
-      const timeInHours = timeInSeconds / 3600;
-  
-      let speed;
-      let result = "";
-  
-      if (unit === "m") {
-        speed = distance / timeInSeconds; // in m/s
-        result = `Speed is ${speed.toFixed(2)} m/s`;
-      } else {
-        speed = distance / timeInHours; // in km/h
-        result = `Speed is ${speed.toFixed(2)} km/h`;
-      }
-  
-      document.getElementById("resultSpeed").innerHTML = result;
-    } else {
-      document.getElementById("resultSpeed").innerHTML = `Please enter valid values.`;
-    }
-  }
-  
-
-    function calculateDistance() {
-      const speedInput = parseFloat(document.getElementById("dspeed").value);
-      const hr = parseFloat(document.getElementById("dhr").value);
-      const min = parseFloat(document.getElementById("dmin").value);
-      const unit = document.getElementById("speedUnit").value;
-
-      if (!isNaN(speedInput) && (!isNaN(hr) || !isNaN(min))) {
-        const time = ((hr || 0) * 60 + (min || 0)) / 60; // time in hours
-        const finalSpeed = unit === 'm/s' ? speedInput * 3.6 : speedInput;
-        const distance = finalSpeed * time;
-        
-        resultUnit = unit === 'm/s' ? `${(distance*1000).toFixed(2)} meters` : `${distance} kilometers`;
-
-        document.getElementById("resultDistance").innerHTML = `Distance is ${resultUnit} `;
-
-
-      } else {
-        document.getElementById("resultDistance").innerHTML = `Please enter valid values.`;
-      }
-    }
-    function calculateTime() {
-      const distance = parseFloat(document.getElementById("tkm").value);
-      const speed = parseFloat(document.getElementById("tspeed").value);
-      const unit = document.getElementById("timeDistanceUnit").value;
-    
-      if (!isNaN(distance) && !isNaN(speed) && speed > 0) {
-        // Convert distance to kilometers if it’s in meters
-        const distanceInKm = unit === "m" ? distance / 1000 : distance;
-    
-        const time = (distanceInKm / speed) * 60; // Time in minutes
-        const hr = Math.floor(time / 60);
-        const min = Math.round(time % 60);
-    
-        document.getElementById("resultTime").innerHTML = `Time is ${hr} hour(s) and ${min} minute(s)`;
-      } else {
-        document.getElementById("resultTime").innerHTML = `Please enter valid values.`;
-      }
-    }
-    
-
-    function clearSpeed() {
-      document.getElementById("km").value = "";
-      document.getElementById("hr").value = "";
-      document.getElementById("min").value = "";
-      document.getElementById("resultSpeed").innerHTML = "";
-    }
-
-    function clearDistance() {
-      document.getElementById("dspeed").value = "";
-      document.getElementById("dhr").value = "";
-      document.getElementById("dmin").value = "";
-      document.getElementById("resultDistance").innerHTML = "";
-    }
-
-    function clearTime() {
-      document.getElementById("tkm").value = "";
-      document.getElementById("tspeed").value = "";
-      document.getElementById("resultTime").innerHTML = "";
-    }
-  </script>
 </body>
 </html>
