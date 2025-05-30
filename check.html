@@ -2,87 +2,103 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Real GPS Speedometer</title>
+    <title>Speedometer (GPS + Simulated)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #0f2027;  /* nice gradient */
-            background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
+            background: linear-gradient(to right, #141e30, #243b55);
             color: white;
             text-align: center;
             padding-top: 100px;
         }
         h1 {
             font-size: 48px;
-            margin-bottom: 20px;
         }
         #speed {
-            font-size: 72px;
-            font-weight: bold;
+            font-size: 80px;
             color: #00ffcc;
+            font-weight: bold;
         }
         #status {
-            margin-top: 20px;
             font-size: 20px;
             color: #ffcc00;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <h1>Speedometer</h1>
     <div id="speed">0 km/h</div>
-    <div id="status">Initializing GPS...</div>
+    <div id="status">Initializing...</div>
 
     <script>
         const speedDisplay = document.getElementById('speed');
         const statusDisplay = document.getElementById('status');
 
-        // Convert m/s to km/h
-        function toKmph(speedInMetersPerSecond) {
-            return speedInMetersPerSecond * 3.6;
+        let useSimulated = false;
+        let simulatedSpeed = 0;
+        let direction = 1;
+
+        // Convert meters/second to km/h
+        function toKmph(mps) {
+            return mps * 3.6;
         }
 
-        // Success callback from Geolocation API
-        function updateSpeed(position) {
-            const speed = position.coords.speed;
+        // Show speed on screen
+        function displaySpeed(kmph) {
+            speedDisplay.textContent = `${kmph.toFixed(1)} km/h`;
+        }
 
-            if (speed === null) {
-                statusDisplay.textContent = "Move around to get GPS speed...";
-                return;
+        // Simulated speed function
+        function startSimulatedSpeed() {
+            statusDisplay.textContent = "Using simulated speed (GPS unavailable)";
+            setInterval(() => {
+                if (direction === 1) {
+                    simulatedSpeed += Math.random() * 2;
+                    if (simulatedSpeed >= 80) direction = -1;
+                } else {
+                    simulatedSpeed -= Math.random() * 2;
+                    if (simulatedSpeed <= 0) direction = 1;
+                }
+                displaySpeed(simulatedSpeed);
+            }, 1000);
+        }
+
+        // Real GPS speed callback
+        function handleGPS(position) {
+            const gpsSpeed = position.coords.speed;
+            if (gpsSpeed === null || gpsSpeed === 0) {
+                if (!useSimulated) {
+                    useSimulated = true;
+                    startSimulatedSpeed();
+                }
+            } else {
+                useSimulated = false;
+                const kmph = toKmph(gpsSpeed);
+                displaySpeed(kmph);
+                statusDisplay.textContent = "Using GPS speed";
             }
-
-            const speedInKmph = toKmph(speed).toFixed(1);
-            speedDisplay.textContent = `${speedInKmph} km/h`;
-            statusDisplay.textContent = "GPS Active";
         }
 
-        // Error handling
-        function handleError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    statusDisplay.textContent = "Permission denied. Please enable location.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    statusDisplay.textContent = "Location unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    statusDisplay.textContent = "Request timed out.";
-                    break;
-                default:
-                    statusDisplay.textContent = "An unknown error occurred.";
-                    break;
+        // Error callback
+        function handleGPSError(error) {
+            if (!useSimulated) {
+                useSimulated = true;
+                startSimulatedSpeed();
             }
         }
 
-        // Start watching GPS location
+        // Try to get real GPS data
         if ('geolocation' in navigator) {
-            navigator.geolocation.watchPosition(updateSpeed, handleError, {
+            navigator.geolocation.watchPosition(handleGPS, handleGPSError, {
                 enableHighAccuracy: true,
                 maximumAge: 1000,
                 timeout: 5000
             });
         } else {
-            statusDisplay.textContent = "Geolocation is not supported by your browser.";
+            statusDisplay.textContent = "Geolocation not supported. Using simulation.";
+            useSimulated = true;
+            startSimulatedSpeed();
         }
     </script>
 </body>
