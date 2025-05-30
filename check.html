@@ -2,46 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Real GPS Speedometer</title>
+    <title>GPS Speedometer Toggle</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
             color: white;
             text-align: center;
-            padding-top: 100px;
+            padding-top: 80px;
         }
         h1 {
             font-size: 48px;
             margin-bottom: 20px;
         }
-        #speedKmph {
-            font-size: 60px;
+        #speed {
+            font-size: 64px;
             font-weight: bold;
             color: #00ffcc;
-        }
-        #speedMps {
-            font-size: 32px;
-            margin-top: 10px;
-            color: #66ff66;
+            margin-bottom: 10px;
         }
         #status {
-            margin-top: 20px;
-            font-size: 20px;
+            font-size: 18px;
             color: #ffcc00;
+            margin-bottom: 30px;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #1abc9c;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #16a085;
+        }
+        .active {
+            background-color: #f39c12 !important;
         }
     </style>
 </head>
 <body>
     <h1>Speedometer</h1>
-    <div id="speedKmph">0.0 km/h</div>
-    <div id="speedMps">0.0 m/s</div>
+    <div id="speed">0.0</div>
     <div id="status">Initializing GPS...</div>
+    
+    <button id="showKmph" class="active">Kilometers/hour</button>
+    <button id="showMps">Meters/second</button>
 
     <script>
-        const speedKmphDisplay = document.getElementById('speedKmph');
-        const speedMpsDisplay = document.getElementById('speedMps');
+        const speedDisplay = document.getElementById('speed');
         const statusDisplay = document.getElementById('status');
+        const showKmphBtn = document.getElementById('showKmph');
+        const showMpsBtn = document.getElementById('showMps');
+
+        let currentUnit = 'kmph';  // default unit
 
         function toKmph(mps) {
             return mps * 3.6;
@@ -55,9 +73,12 @@
                 return;
             }
 
-            const kmph = toKmph(speed);
-            speedKmphDisplay.textContent = `${kmph.toFixed(1)} km/h`;
-            speedMpsDisplay.textContent = `${speed.toFixed(1)} m/s`;
+            if (currentUnit === 'kmph') {
+                speedDisplay.textContent = `${toKmph(speed).toFixed(1)} km/h`;
+            } else {
+                speedDisplay.textContent = `${speed.toFixed(1)} m/s`;
+            }
+
             statusDisplay.textContent = "GPS Active";
         }
 
@@ -78,6 +99,20 @@
             }
         }
 
+        // Toggle buttons
+        showKmphBtn.addEventListener('click', () => {
+            currentUnit = 'kmph';
+            showKmphBtn.classList.add('active');
+            showMpsBtn.classList.remove('active');
+        });
+
+        showMpsBtn.addEventListener('click', () => {
+            currentUnit = 'mps';
+            showMpsBtn.classList.add('active');
+            showKmphBtn.classList.remove('active');
+        });
+
+        // Start GPS tracking
         if ('geolocation' in navigator) {
             navigator.geolocation.watchPosition(updateSpeed, handleError, {
                 enableHighAccuracy: true,
