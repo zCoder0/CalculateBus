@@ -316,5 +316,74 @@
     </div>
   </div>
 
+  <script>
+    const speedDisplay = document.getElementById('speed');
+    const statusDisplay = document.getElementById('status');
+    const showKmphBtn = document.getElementById('showKmph');
+    const showMpsBtn = document.getElementById('showMps');
+
+    let currentUnit = 'kmph';
+
+    function toKmph(mps) {
+      return mps * 3.6;
+    }
+
+    function updateSpeed(position) {
+      const speed = position.coords.speed;
+
+      if (speed === null) {
+        statusDisplay.textContent = "Move to get GPS speed...";
+        speedDisplay.textContent = `0.0 ${currentUnit === 'kmph' ? 'km/h' : 'm/s'}`;
+        return;
+      }
+
+      if (currentUnit === 'kmph') {
+        speedDisplay.textContent = `${toKmph(speed).toFixed(1)} km/h`;
+      } else {
+        speedDisplay.textContent = `${speed.toFixed(1)} m/s`;
+      }
+      statusDisplay.textContent = "GPS Active";
+    }
+
+    function handleError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          statusDisplay.textContent = "Permission denied. Please enable location.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          statusDisplay.textContent = "Location unavailable.";
+          break;
+        case error.TIMEOUT:
+          statusDisplay.textContent = "Request timed out.";
+          break;
+        default:
+          statusDisplay.textContent = "An unknown error occurred.";
+          break;
+      }
+    }
+
+    showKmphBtn.addEventListener('click', () => {
+      currentUnit = 'kmph';
+      showKmphBtn.classList.add('active');
+      showMpsBtn.classList.remove('active');
+    });
+
+    showMpsBtn.addEventListener('click', () => {
+      currentUnit = 'mps';
+      showMpsBtn.classList.add('active');
+      showKmphBtn.classList.remove('active');
+    });
+
+    if ('geolocation' in navigator) {
+      navigator.geolocation.watchPosition(updateSpeed, handleError, {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 5000
+      });
+    } else {
+      statusDisplay.textContent = "Geolocation is not supported by your browser.";
+    }
+  </script>
+
 </body>
 </html>
