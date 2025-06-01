@@ -230,8 +230,13 @@
       <button id="showKmph" class="active">Kilometers/hour</button>
       <button id="showMps">Meters/second</button>
     </div>
+
+
+    <p id="coords" ></p>
   </header>
 
+  
+  
   <div class="calculator-container">
     <div class="calculator">
       <h2>Speed, Distance & Time Calculator</h2>
@@ -330,7 +335,10 @@
 
     function updateSpeed(position) {
       const speed = position.coords.speed;
-
+      const coord = position.coords;
+      
+      cord = document.getElementById('coords');  
+      cord.textContent = coord ; 
       if (speed === null) {
         statusDisplay.textContent = "Move to get GPS speed...";
         speedDisplay.textContent = `0.0 ${currentUnit === 'kmph' ? 'km/h' : 'm/s'}`;
