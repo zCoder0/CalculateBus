@@ -232,7 +232,7 @@
     </div>
 
 
-    <p id="coords" ></p>
+    <p id="coords" > </p>
   </header>
 
   
@@ -327,6 +327,7 @@
     const showKmphBtn = document.getElementById('showKmph');
     const showMpsBtn = document.getElementById('showMps');
 
+    cord = document.getElementById('coords');  
     let currentUnit = 'kmph';
 
     function toKmph(mps) {
@@ -337,8 +338,8 @@
       const speed = position.coords.speed;
       const coord = position.coords;
       
-      cord = document.getElementById('coords');  
-      cord.textContent = coord ; 
+      cord.textContent = `${coord.latitude.toFixed(6)}, ${coord.longitude.toFixed(6)}` ; 
+      
       if (speed === null) {
         statusDisplay.textContent = "Move to get GPS speed...";
         speedDisplay.textContent = `0.0 ${currentUnit === 'kmph' ? 'km/h' : 'm/s'}`;
@@ -348,9 +349,11 @@
       if (currentUnit === 'kmph') {
         speedDisplay.textContent = `${toKmph(speed).toFixed(1)} km/h`;
       } else {
+
         speedDisplay.textContent = `${speed.toFixed(1)} m/s`;
       }
       statusDisplay.textContent = "GPS Active";
+    
     }
 
     function handleError(error) {
